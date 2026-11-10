@@ -6,11 +6,24 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(__dirname, "..", "data");
 const dataFile = path.join(dataDir, "mood.json");
 
+export const THEMES = ["lagoon", "ember", "moss", "ink", "bloom"];
+export const PRESENCES = {
+  free: { label: "вільний", emoji: "🟢" },
+  focus: { label: "у фокусі", emoji: "🟡" },
+  away: { label: "відійшов", emoji: "🟠" },
+  sleep: { label: "спить", emoji: "🔵" },
+};
+
 const defaultState = {
   text: "ще тихо",
   note: "напиши боту свій настрій",
   intensity: 5,
   emoji: "☁️",
+  presence: "free",
+  doing: "",
+  listening: "",
+  signal: "",
+  theme: "lagoon",
   updatedAt: null,
   history: [],
 };
@@ -23,6 +36,8 @@ async function ensureStore() {
   try {
     const raw = await fs.readFile(dataFile, "utf8");
     state = { ...defaultState, ...JSON.parse(raw) };
+    if (!THEMES.includes(state.theme)) state.theme = "lagoon";
+    if (!PRESENCES[state.presence]) state.presence = "free";
   } catch {
     await persist();
   }
@@ -39,12 +54,24 @@ function notify() {
   }
 }
 
+function touch() {
+  state.updatedAt = new Date().toISOString();
+}
+
 export function getPublicState() {
+  const presence = PRESENCES[state.presence] || PRESENCES.free;
   return {
     text: state.text,
     note: state.note,
     intensity: state.intensity,
     emoji: state.emoji,
+    presence: state.presence,
+    presenceLabel: presence.label,
+    presenceEmoji: presence.emoji,
+    doing: state.doing,
+    listening: state.listening,
+    signal: state.signal,
+    theme: state.theme,
     updatedAt: state.updatedAt,
     history: state.history.slice(0, 12),
   };
@@ -69,9 +96,7 @@ function guessEmoji(text) {
 
 export async function setMood({ text, note = "", intensity = 5, emoji }) {
   const cleanText = String(text || "").trim().slice(0, 120);
-  if (!cleanText) {
-    throw new Error("Mood text is empty");
-  }
+  if (!cleanText) throw new Error("Mood text is empty");
 
   const next = {
     text: cleanText,
@@ -82,13 +107,41 @@ export async function setMood({ text, note = "", intensity = 5, emoji }) {
   };
 
   state = {
+    ...state,
     ...next,
-    history: [
-      next,
-      ...state.history.filter((item) => item.text !== next.text || item.updatedAt !== next.updatedAt),
-    ].slice(0, 30),
+    history: [next, ...state.history].slice(0, 30),
   };
 
+  await persist();
+  notify();
+  return getPublicState();
+}
+
+export async function patchState(partial) {
+  const next = { ...state };
+
+  if (partial.doing !== undefined) {
+    next.doing = String(partial.doing || "").trim().slice(0, 120);
+  }
+  if (partial.listening !== undefined) {
+    next.listening = String(partial.listening || "").trim().slice(0, 120);
+  }
+  if (partial.signal !== undefined) {
+    next.signal = String(partial.signal || "").trim().slice(0, 160);
+  }
+  if (partial.presence !== undefined) {
+    const key = String(partial.presence || "").trim().toLowerCase();
+    if (!PRESENCES[key]) throw new Error("Unknown presence");
+    next.presence = key;
+  }
+  if (partial.theme !== undefined) {
+    const theme = String(partial.theme || "").trim().toLowerCase();
+    if (!THEMES.includes(theme)) throw new Error("Unknown theme");
+    next.theme = theme;
+  }
+
+  state = next;
+  touch();
   await persist();
   notify();
   return getPublicState();

@@ -169,8 +169,10 @@ body::before {
 .hint,
 .kicker,
 .mood-note,
+.signal,
 .intensity span,
-.history-head p {
+.history-head p,
+.now-label {
   color: var(--muted);
 }
 
@@ -181,6 +183,10 @@ body::before {
   font-size: 0.92rem;
   letter-spacing: 0.04em;
   text-transform: lowercase;
+}
+
+.sep {
+  opacity: 0.45;
 }
 
 .live-dot {
@@ -240,12 +246,48 @@ body::before {
   line-height: 1.5;
 }
 
+.signal {
+  margin: 1rem auto 0;
+  max-width: 28rem;
+  font-family: "Instrument Serif", serif;
+  font-style: italic;
+  font-size: clamp(1.15rem, 2.8vw, 1.55rem);
+  line-height: 1.35;
+}
+
 .intensity {
   width: min(18rem, 70vw);
   margin: 2.4rem auto 0;
   display: grid;
   gap: 0.7rem;
   justify-items: center;
+}
+
+.now-grid {
+  width: min(34rem, 92vw);
+  margin: 2.2rem auto 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.now-item {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.95rem 1.05rem;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  animation: rise 0.55s var(--ease) both;
+}
+
+.now-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.now-item strong {
+  font-weight: 600;
+  font-size: 1.05rem;
 }
 
 .intensity-track {

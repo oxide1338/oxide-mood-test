@@ -26,6 +26,8 @@
       <div class="top-meta">
         <span class="live-dot" aria-hidden="true"></span>
         <span id="connection">онлайн</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span id="presenceLabel">🟢 вільний</span>
       </div>
     </header>
 
@@ -34,12 +36,24 @@
       <p class="emoji" id="emoji" aria-hidden="true">☁️</p>
       <h1 class="mood-text" id="moodText">ще тихо</h1>
       <p class="mood-note" id="moodNote">напиши боту свій настрій</p>
+      <p class="signal" id="signal" hidden></p>
 
       <div class="intensity" aria-label="інтенсивність настрою">
         <div class="intensity-track">
           <div class="intensity-fill" id="intensityFill"></div>
         </div>
         <span id="intensityLabel">5 / 10</span>
+      </div>
+
+      <div class="now-grid" id="nowGrid">
+        <div class="now-item" id="doingWrap" hidden>
+          <span class="now-label">зараз</span>
+          <strong id="doingText"></strong>
+        </div>
+        <div class="now-item" id="listeningWrap" hidden>
+          <span class="now-label">слухає</span>
+          <strong id="listeningText"></strong>
+        </div>
       </div>
     </main>
 

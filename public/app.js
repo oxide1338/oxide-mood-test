@@ -1,16 +1,23 @@
 const els = {
   connection: document.getElementById("connection"),
+  presenceLabel: document.getElementById("presenceLabel"),
   updated: document.getElementById("updated"),
   emoji: document.getElementById("emoji"),
   moodText: document.getElementById("moodText"),
   moodNote: document.getElementById("moodNote"),
+  signal: document.getElementById("signal"),
   intensityFill: document.getElementById("intensityFill"),
   intensityLabel: document.getElementById("intensityLabel"),
+  doingWrap: document.getElementById("doingWrap"),
+  doingText: document.getElementById("doingText"),
+  listeningWrap: document.getElementById("listeningWrap"),
+  listeningText: document.getElementById("listeningText"),
   historyList: document.getElementById("historyList"),
 };
 
-const THEME_KEY = "moodtracker-theme";
 let lastUpdatedAt = null;
+let localThemeLock = false;
+let lastServerTheme = null;
 
 function formatWhen(iso) {
   if (!iso) return "чекаємо перший сигнал";
@@ -44,6 +51,27 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
+function applyTheme(theme) {
+  if (!theme) return;
+  document.body.dataset.theme = theme;
+  document.documentElement.dataset.theme = theme;
+
+  for (const button of document.querySelectorAll(".theme-btn")) {
+    button.classList.toggle("is-active", button.dataset.theme === theme);
+  }
+}
+
+function setOptional(wrap, textEl, value) {
+  const clean = String(value || "").trim();
+  if (!clean) {
+    wrap.hidden = true;
+    textEl.textContent = "";
+    return;
+  }
+  wrap.hidden = false;
+  textEl.textContent = clean;
+}
+
 function renderMood(mood) {
   if (!mood) return;
 
@@ -52,10 +80,25 @@ function renderMood(mood) {
   els.moodText.textContent = mood.text || "ще тихо";
   els.moodNote.textContent = mood.note || "напиши боту свій настрій";
   els.updated.textContent = formatWhen(mood.updatedAt);
+  els.presenceLabel.textContent = `${mood.presenceEmoji || "🟢"} ${mood.presenceLabel || "вільний"}`;
+
+  const signal = String(mood.signal || "").trim();
+  els.signal.hidden = !signal;
+  els.signal.textContent = signal ? `“${signal}”` : "";
 
   const intensity = Number(mood.intensity) || 5;
   els.intensityFill.style.width = `${intensity * 10}%`;
   els.intensityLabel.textContent = `${intensity} / 10`;
+
+  setOptional(els.doingWrap, els.doingText, mood.doing);
+  setOptional(els.listeningWrap, els.listeningText, mood.listening);
+
+  const serverTheme = mood.theme || "lagoon";
+  if (serverTheme !== lastServerTheme) {
+    lastServerTheme = serverTheme;
+    localThemeLock = false;
+  }
+  if (!localThemeLock) applyTheme(serverTheme);
 
   els.moodText.animate(
     [
@@ -82,22 +125,11 @@ function renderMood(mood) {
     .join("");
 }
 
-function applyTheme(theme) {
-  document.body.dataset.theme = theme;
-  document.documentElement.dataset.theme = theme;
-  localStorage.setItem(THEME_KEY, theme);
-
-  for (const button of document.querySelectorAll(".theme-btn")) {
-    button.classList.toggle("is-active", button.dataset.theme === theme);
-  }
-}
-
 function initThemes() {
-  applyTheme(localStorage.getItem(THEME_KEY) || "lagoon");
-
   document.querySelector(".themes")?.addEventListener("click", (event) => {
     const button = event.target.closest(".theme-btn");
     if (!button) return;
+    localThemeLock = true;
     applyTheme(button.dataset.theme);
   });
 }
