@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mood · live</title>
+    <meta name="description" content="Живий настрій, оновлюється через Telegram." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body data-theme="lagoon">
+    <div class="atmosphere" aria-hidden="true">
+      <div class="orb orb-a"></div>
+      <div class="orb orb-b"></div>
+      <div class="orb orb-c"></div>
+      <div class="grain"></div>
+    </div>
+
+    <header class="top">
+      <p class="brand">mood</p>
+      <div class="top-meta">
+        <span class="live-dot" aria-hidden="true"></span>
+        <span id="connection">онлайн</span>
+      </div>
+    </header>
+
+    <main class="stage">
+      <p class="kicker" id="updated">чекаємо перший сигнал</p>
+      <p class="emoji" id="emoji" aria-hidden="true">☁️</p>
+      <h1 class="mood-text" id="moodText">ще тихо</h1>
+      <p class="mood-note" id="moodNote">напиши боту свій настрій</p>
+
+      <div class="intensity" aria-label="інтенсивність настрою">
+        <div class="intensity-track">
+          <div class="intensity-fill" id="intensityFill"></div>
+        </div>
+        <span id="intensityLabel">5 / 10</span>
+      </div>
+    </main>
+
+    <section class="history" aria-label="недавні настрої">
+      <div class="history-head">
+        <h2>слід</h2>
+        <p>останні оновлення</p>
+      </div>
+      <ul class="history-list" id="historyList"></ul>
+    </section>
+
+    <footer class="bottom">
+      <div class="themes" role="group" aria-label="тема градієнту">
+        <button class="theme-btn is-active" data-theme="lagoon" type="button">lagoon</button>
+        <button class="theme-btn" data-theme="ember" type="button">ember</button>
+        <button class="theme-btn" data-theme="moss" type="button">moss</button>
+        <button class="theme-btn" data-theme="ink" type="button">ink</button>
+        <button class="theme-btn" data-theme="bloom" type="button">bloom</button>
+      </div>
+      <p class="hint">оновлюється з Telegram у реальному часі</p>
+    </footer>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
